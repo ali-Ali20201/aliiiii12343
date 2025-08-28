@@ -323,20 +323,15 @@ async def is_subscribed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> b
 
 # --------------------- Handlers أساسية ---------------------
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = get_user(update.effective_user.id)
-    if not user.get("in_channels"):
-        keyboard = [[InlineKeyboardButton("✅ التحقق من الاشتراك", callback_data="check_sub")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(
-            "يجب عليك الاشتراك في القنوات التالية أولاً:",
-            reply_markup=reply_markup
-        )
-        return
     ensure_user(update.effective_user)
-    # هذا السطر هو مفتاح التحقق
+    
     if not await is_subscribed(update, context):
         text, keyboard = subscription_menu_kb()
-        await update.message.reply_text(text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        await update.message.reply_text(
+            text,
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML
+        )
     else:
         u = get_user(update.effective_user.id)
         await update.message.reply_text(
@@ -345,6 +340,30 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
         )
+
+async def check_subscription_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if await is_subscribed(update, context):
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET in_channels = ? WHERE id = ?", (True, query.from_user.id))
+        conn.commit()
+        conn.close()
+        
+        await query.message.edit_text("✅ تم التحقق! يمكنك الآن استخدام البوت. اضغط على /start للبدء.")
+    else:
+        text, keyboard = subscription_menu_kb()
+        await query.message.edit_text(text, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+        
+async def show_account(update: Update, context: ContextTypes.DEFAULT_TYPE, as_new: bool = True):
+    ensure_user(update.effective_user)
+    u = get_user(update.effective_user.id)
+    if as_new:
+        await update.effective_chat.send_message(account_text(u), parse_mode=ParseMode.HTML)
+    else:
+        await update.callback_query.edit_message_text(account_text(u), parse_mode=ParseMode.HTML)
 
 async def check_subscription_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1365,5 +1384,6 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
