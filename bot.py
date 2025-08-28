@@ -1279,6 +1279,12 @@ async def handle_admin_text_input(update: Update, context: ContextTypes.DEFAULT_
         context.user_data.clear()
         return
 
+    # هذا الشرط الأخير مهم جداً!
+    if flow and flow.startswith("adm_"):
+        await update.message.reply_text("هذا الأمر غير مدعوم أو غير مكتمل. الرجاء المحاولة مرة أخرى.")
+        context.user_data.clear()
+        return
+
 # --------------------- نقاط الدخول ---------------------
 async def on_any_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1351,3 +1357,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
