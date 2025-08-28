@@ -241,7 +241,6 @@ def admin_menu_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("🛒 إدارة المنتجات", callback_data="ADM_PRODS")],
         [InlineKeyboardButton("👤 إدارة المستخدمين", callback_data="ADM_USERS")],
         [InlineKeyboardButton("⚙️ الإعدادات", callback_data="ADM_SETTINGS")],
-        [InlineKeyboardButton("📜 إدارة الاشتراكات", callback_data="ADM_SUBS")],
     ])
 
 def subs_menu_kb() -> InlineKeyboardMarkup:
@@ -324,6 +323,15 @@ async def is_subscribed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> b
 
 # --------------------- Handlers أساسية ---------------------
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = get_user(update.effective_user.id)
+    if not user.get("in_channels"):
+        keyboard = [[InlineKeyboardButton("✅ التحقق من الاشتراك", callback_data="check_sub")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(
+            "يجب عليك الاشتراك في القنوات التالية أولاً:",
+            reply_markup=reply_markup
+        )
+        return
     ensure_user(update.effective_user)
     # هذا السطر هو مفتاح التحقق
     if not await is_subscribed(update, context):
@@ -1357,4 +1365,5 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
