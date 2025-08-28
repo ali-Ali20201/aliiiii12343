@@ -1371,7 +1371,7 @@ def main():
     app.add_handler(CommandHandler("admin", cmd_admin))
 
     # أزرار إنلاين
-    app.add_handler(CallbackQueryHandler(on_any_callback))
+application.add_handler(CallbackQueryHandler(check_subscription_handler, pattern="^check_sub$"))
 
     # رسائل المستخدم (لنصوص التدفق)
     app.add_handler(
@@ -1384,6 +1384,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
