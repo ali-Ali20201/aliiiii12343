@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # --------------------- الثوابت والمتغيرات ---------------------
 
 # تم وضع توكن البوت الخاص بك هنا
-BOT_TOKEN = "8198045358:AAFsT1QclpBkOmMFkTXk749hqJUYon504cA"
+BOT_TOKEN = "8439068545:AAFe_SlJuLJp7-ue4rZQljN6WVl_GFPT_l4"
 DB_PATH = "bot_data.db"
 
 # تم وضع آيدي الأدمن الخاص بك هنا
@@ -1349,4 +1349,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
